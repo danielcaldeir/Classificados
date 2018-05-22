@@ -105,8 +105,11 @@ class usuario extends conexao{
     }
     
     public function selecionarALLUser(){
-        $sql = "SELECT * FROM usuarios";
-        $this->query($sql);
+        $tabela = "usuarios";
+        $colunas = array("id", "nome", "email", "senha", "status", "telefone");
+        $this->selecionarTabelas($tabela, $colunas);
+        //$sql = "SELECT * FROM usuarios";
+        //$this->query($sql);
         return $this->result();
     }
     
