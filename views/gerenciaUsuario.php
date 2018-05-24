@@ -6,7 +6,6 @@
 <!--        <?php print_r($usuarios);?>
 <!--    </pre>
 -->
--->
         <div class="container">
             <div class="dropdown">
                 <button class="btn-primary dropdown-toggle" data-toggle="dropdown">

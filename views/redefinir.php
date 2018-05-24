@@ -13,17 +13,18 @@
                 <label>Token inválido ou usado!!</label>
             </div>
     <?php endif; ?>
-    <?php if ( !empty($sucess) ) :?>
-            <div class="alert-success">
-                <strong>Parabens Senha Alterada com Sucesso!</strong>
-                <a href="<?php echo(BASE_URL); ?>login/">Voltar a pagina de login</a>
-            </div>
-    <?php endif; ?>
     <?php if ( !empty($redefinir) ) :?>
             <div class="alert-success">
                 <strong>Parabens E-Mail Encontrado!</strong>
             </div>
     <?php endif; ?>
+    <?php if ( !empty($sucess) ) :?>
+            <div class="alert-success">
+                <strong>Parabens Senha Alterada com Sucesso!</strong>
+                <br/>
+                <a href="<?php echo(BASE_URL); ?>login/">Voltar a pagina de login</a>
+            </div>
+    <?php else :?>
     <form action="<?php echo($link); ?>" method="POST">
         <div class="form-group">
             <label>Digite a nova senha:</label>
@@ -32,4 +33,5 @@
         <input type="hidden" name="token" value="<?php echo($token); ?>"/>
         <input type="submit" value="Mudar senha" class="btn-default"/>
     </form>
+    <?php endif; ?>
 </div>

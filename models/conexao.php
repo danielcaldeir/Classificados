@@ -114,7 +114,7 @@ class conexao {
                 $dados[] = $chave." = '".addslashes($valor)."'";
             }
             $sql = $sql.implode(", ", $dados);
-            echo $sql;
+            //echo $sql;
             try {
                 $this->pdo->query($sql);
             } catch (PDOException $exc) {
