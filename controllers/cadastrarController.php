@@ -22,7 +22,8 @@ class cadastrarController extends controller{
         return $tel;
     }
     
-    private function cadastrarUser($user) {
+    private function cadastrarUser(usuario $user) {
+        $user->selecionarEmail();
         if ($user->numRows() == 0){
             $array = $user->incluirNomeEmailSenha();
             
@@ -45,40 +46,65 @@ class cadastrarController extends controller{
             //echo ("<h2>E-Mail: ".$email."</h2>");
             //echo ("<a href=".$link.">Clique aqui para confirmar</a>");
             
-            $dados = array(
-                "confirme" => "sucess",
-                "link" => $link
-            );
+            $dados = array();
+            $dados["confirme"] = "sucess";
+            $dados["link"] = $link;
         } else {
-            $dados = array(
-                "confirme" => "existe"
-            );
+            $dados = array();
+            $dados["confirme"] = "existe";
         }
         return $dados;
     }
     
-    private function editarUsuario($user, $info) {
+    private function atualizarInfo($id, $nome, $email, $telefone) {
+        $info = array();
+        $info["id"] = $id;
+        $info["nome"] = $nome;
+        $info["email"] = $email;
+        $info["telefone"] = $telefone;
+        
+        return $info;
+    }
+    
+    private function selecionarUser($id, $nome, $email, $senha, $telefone) {
+        $user = new usuario();
+        $dados = array();
+        
+        $user->setID($id);
+        $user->setNome($nome);
+        $user->setEmail($email);
+        $user->setSenha($senha);
+        $tel = $this->isTelefoneNull($telefone);
+        $user->setTelefone($tel);
+        
+        $user->selecionarEmail();
+        
+        $info = $this->atualizarInfo($id, $nome, $email, $telefone);
+        //$info = array();
+        //$info["id"] = $id;
+        //$info["nome"] = $nome;
+        //$info["email"] = $email;
+        //$info["telefone"] = $telefone;
+        
         if ($user->numRows() > 1){
-            $dados = array( 
-                "confirme" => "existe", 
-                "dado" => $info 
-            );
+        //    $dados = array();
+            $dados["confirme"] = "existe";
+            $dados["dado"] = $info;
             //$this->loadTemplate("editarUser", $dados);
         } else {
             $user->atualizarNomeEmailSenha();
-            $dados = array( 
-                "confirme" => "sucess", 
-                "dado" => $info 
-            );
+        //    $dados = array();
+            $dados["confirme"] = "sucess";
+            $dados["dado"] = $info;
             //$this->loadTemplate("editarUser", $dados);
         }
         return $dados;
     }
     
     public function index($confirme = ""){
-        $dados = array(
-            "confirme" => $confirme
-        );
+        $dados = array();
+        $dados["confirme"] = $confirme;
+        
         $this->loadTemplate("cadastrar", $dados);
     }
     
@@ -91,37 +117,41 @@ class cadastrarController extends controller{
             $usuarios[] = $user->result();
         }
         
-        $dados = array(
-            "usuarios" => $usuarios
-        );
+        $dados = array();
+        $dados["usuarios"] = $usuarios;
         $this->loadTemplate("gerenciaUsuario", $dados);
     }
     
     public function editarUserControll(){
         // put your code here
-        $user = new usuario();
-        $id = addslashes($_POST['id']);             $nome = addslashes($_POST['nome']);
-        $email = addslashes($_POST['email']);       $senha = addslashes($_POST['senha']);
+        //$user = new usuario();
+        $id = addslashes($_POST['id']);
+        $nome = addslashes($_POST['nome']);
+        $email = addslashes($_POST['email']);
+        $senha = addslashes($_POST['senha']);
         $telefone = addslashes($_POST['telefone']); 
         
         //$sql = $pdo->atualizarNomeEmailSenha($id, $nome, $email, $senha);
-        $user->setID($id);         $user->setNome($nome);
-        $user->setEmail($email);   $user->setSenha($senha);
-        $tel = $this->isTelefoneNull($telefone);
-        $user->setTelefone($tel);
+        $dados = $this->selecionarUser($id, $nome, $email, $senha, $telefone);
+        //$user->setID($id);
+        //$user->setNome($nome);
+        //$user->setEmail($email);
+        //$user->setSenha($senha);
+        //$tel = $this->isTelefoneNull($telefone);
+        //$user->setTelefone($tel);
     //    if(is_null($telefone)){
     //        $user->setTelefone("");
     //    } else {
     //        $user->setTelefone($telefone);
     //    }
-        $user->selecionarEmail();
-        $info = array( 
-            "id" => $id, 
-            "nome" => $nome, 
-            "email" => $email, 
-            "telefone" => $telefone 
-        );
-        $dados = $this->editarUsuario($user, $info);
+        //$user->selecionarEmail();
+        //$info = array( 
+        //    "id" => $id, 
+        //    "nome" => $nome, 
+        //    "email" => $email, 
+        //    "telefone" => $telefone 
+        //);
+        //$dados = $this->editarUsuario($user, $info);
         //if ($user->numRows() > 1){
         //    $dados = array( "confirme" => "existe", "dado" => $dado );
         //    //$this->loadTemplate("editarUser", $dados);
@@ -135,28 +165,29 @@ class cadastrarController extends controller{
     
     public function editarUser($id, $confirme = ""){
         $user = new usuario();
+        $dados = array();
+        
         $user->setID($id);
         $user->selecionarUser();
         
         if ($user->numRows() > 0) {
             $dado = $user->result();
             
-            $dados = array(
-                "dado" => $dado,
-                "confirme" => $confirme
-            );
+        //    $dados = array();
+            $dados["dado"] = $dado;
+            $dados["confirme"] = $confirme;
         }else{
             //header("Location: gerenciaUsuario.php");
-            $dados = array(
-                "dado" => "",
-                "confirme" => "non-existe"
-            );
+        //    $dados = array();
+            $dados["dado"] = "";
+            $dados["confirme"] = "non-existe";
         }
         
         $this->loadTemplate("editarUser", $dados);
     }
     
     public function addUser(){
+        $dados = array();
         if (isset($_POST['nome']) && empty($_POST['nome'])==false){
             $nome = addslashes($_POST['nome']);
             $email = addslashes($_POST['email']);
@@ -170,13 +201,8 @@ class cadastrarController extends controller{
                 $user->setSenha($senha);
                 $tel = $this->isTelefoneNull($telefone);
                 $user->setTelefone($tel);
-            //    if(is_null($telefone)){
-            //        $user->setTelefone("");
-            //    } else {
-            //        $user->setTelefone($telefone);
-            //    }
 
-                $user->selecionarEmail();
+            //    $user->selecionarEmail();
                 $dados = $this->cadastrarUser($user);
                 //$this->loadTemplate("cadastrar", $dados);
                 //if ($user->numRows() == 0){
@@ -214,17 +240,16 @@ class cadastrarController extends controller{
                 //    );
                 //    $this->loadTemplate("cadastrar", $dados);
                 //}
-
-            } else { $dados = array( "confirme" => "error" ); }
-        } else{ $dados = array( "confirme" => "error" ); }
+            } else { $dados["confirme"] = "error"; }
+        } else{ $dados["confirme"] = "error"; }
         $this->loadTemplate("cadastrar", $dados);
     }
     
     public function confirmarEmail($token, $confirme = ""){
-        $dados = array(
-            "token" => $token,
-            "confirme" => $confirme
-        );
+        $dados = array();
+        $dados["token"] = $token;
+        $dados["confirme"] = $confirme;
+        
         $this->loadTemplate("confirmarEmail", $dados);
     }
     
@@ -237,16 +262,19 @@ class cadastrarController extends controller{
             $count = $user->confirmarEmail();
             
             if ($count){
-                $dados = array( "confirme" => "sucess" );
+                $dados = array();
+                $dados["confirme"] = "sucess";
                 //$this->loadTemplate("confirmarEmail", $dados);
             } else {
-                $dados = array( "confirme" => "error" );
+                $dados = array();
+                $dados["confirme"] = "error";
                 //$this->loadTemplate("confirmarEmail", $dados);
             }
             $this->loadTemplate("confirmarEmail", $dados);
         } else {
             //header("Location: ../index.php?pag=cadastrar&error=true");
-            $dados = array( "confirme" => "error" );
+            $dados = array();
+            $dados["confirme"] = "error";
             $this->loadTemplate("cadastrar", $dados);
         }
     }

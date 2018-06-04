@@ -7,12 +7,6 @@
                 <label>Preencha todos os Campos</label>
             </div>
     <?php endif; ?>
-    <?php if ( $confirme == "existe" ) :?>
-            <div class="alert-warning">
-                <label>Este usuario ja existe!</label><br>
-                <a href="<?php echo BASE_URL; ?>login/">Faca o login.</a>
-            </div>
-    <?php endif; ?>
     <?php if ( $confirme == "sucess" ) :?>
             <div class="alert-success">
                 <strong>Parabens Cadastro Realizado!</strong>
@@ -21,6 +15,12 @@
                 </a>
             </div>
     <?php endif; ?>
+    <?php if ( $confirme == "existe" ) :?>
+            <div class="alert-warning">
+                <label>Este usuario ja existe!</label><br/>
+                <a href="<?php echo BASE_URL; ?>login/">Faca o login.</a>
+            </div>
+    <?php else :?>
     <form action="<?php echo BASE_URL; ?>cadastrar/addUser" method="POST">
         <div class="form-group">
             <label for="nome">Nome:</label>
@@ -40,6 +40,8 @@
         </div>
         <input type="submit" id="botaoEnviarForm" value="Cadastrar" class="btn-default"/>
     </form>
+    <?php endif; ?>
+    
     <br/>
     <br/>
     <br/>

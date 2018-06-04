@@ -19,9 +19,44 @@ class produtoController extends controller{
         $this->loadTemplate("erro", $dados);
     }
     
+    private function selecionarAnunciosImagens($id) {
+        $anunImagens = new anunciosImagens();
+        $anunImagens->setIDAnuncio($id);
+        $fotos = $anunImagens->selecionarAnunciosImagens();
+        
+        if ($anunImagens->numRows() == 1){
+            $fotos = array();
+            $fotos[] = $anunImagens->result();
+        }
+        return $fotos;
+    }
+    
+    private function selecionarCategorias() {
+        $cat = new categorias();
+        return $cat->selecionarAllCategorias();
+    }
+    
+    private function incluirAnuncios($idUsuario, $titulo, $categoria, $valor, $descricao, $estado) {
+        $anuncio = new anuncios();
+        $anuncio->setIDUsuario($idUsuario);
+        $anuncio->setTitulo($titulo);
+        $anuncio->setIDCategoria($categoria);
+        $anuncio->setValor($valor);
+        $anuncio->setDescricao($descricao);
+        $anuncio->setEstado($estado);
+        $anuncio->incluirAnuncios();
+    }
+    
+    private function selecionarAnunciosID($idAnuncio) {
+        $anuncio = new anuncios();
+        $anuncio->setID($idAnuncio);
+        return $anuncio->selecionarAnunciosID();
+    }
+    
     public function addAnuncio() {
-        $c = new categorias();
-        $cats = $c->selecionarAllCategorias();
+        //$c = new categorias();
+        //$cats = $c->selecionarAllCategorias();
+        $cats = $this->selecionarCategorias();
         $dados = array (
             "cats" => $cats
         );
@@ -39,15 +74,16 @@ class produtoController extends controller{
             $estado = addslashes($_POST['estado']);
 
             if (!empty($titulo) && !empty($categoria) && !empty($valor)){
-                $anuncio = new anuncios();
-                $anuncio->setIDUsuario($usuario);
-                $anuncio->setTitulo($titulo);
-                $anuncio->setIDCategoria($categoria);
-                $anuncio->setValor($valor);
-                $anuncio->setDescricao($descricao);
-                $anuncio->setEstado($estado);
-
-                $anuncio->incluirAnuncios();
+                $this->incluirAnuncios($usuario, $titulo, $categoria, $valor, $descricao, $estado);
+                //$anuncio = new anuncios();
+                //$anuncio->setIDUsuario($usuario);
+                //$anuncio->setTitulo($titulo);
+                //$anuncio->setIDCategoria($categoria);
+                //$anuncio->setValor($valor);
+                //$anuncio->setDescricao($descricao);
+                //$anuncio->setEstado($estado);
+                //$anuncio->incluirAnuncios();
+                
                 //exit();
                 //header("Location: ../index.php?pag=addAnuncio&sucess=true");
                 $dados["sucess"] = "true";
@@ -61,43 +97,52 @@ class produtoController extends controller{
             $dados["error"] = "true";
         }
         
-        $c = new categorias();
-        $cats = $c->selecionarAllCategorias();
+        //$c = new categorias();
+        //$cats = $c->selecionarAllCategorias();
+        $cats = $this->selecionarCategorias();
         $dados["cats"] = $cats;
         $this->loadTemplate("addAnuncio", $dados);
     }
     
     public function editarAnuncio($id, $confirme = "") {
         
-        $anuncio = new anuncios();
-        $anuncio->setID($id);
-        $anuncio->selecionarAnunciosID();
-        $info = $anuncio->result();
+        $info = $this->selecionarAnunciosID($id);
+        //$anuncio = new anuncios();
+        //$anuncio->setID($id);
+        //$anuncio->selecionarAnunciosID();
+        //$info = $anuncio->result();
         
-        $anunImagens = new anunciosImagens();
-        $anunImagens->setIDAnuncio($id);
-        $anunImagens->selecionarAnunciosImagens();
-        $fotosArray = array();
-        if ($anunImagens->numRows() == 1){
-            $fotosArray[] = $anunImagens->result();
+        $fotosArray = $this->selecionarAnunciosImagens($id);
+        if (is_array($fotosArray)){
             $fotos = true;
-        } elseif ($anunImagens->numRows() > 1) {
-            $fotosArray = $anunImagens->result();
-            $fotos = true;
-        }else {
+        } else {
             $fotos = false;
         }
-        $c = new categorias();
-        $cats = $c->selecionarAllCategorias();
+        //$anunImagens = new anunciosImagens();
+        //$anunImagens->setIDAnuncio($id);
+        //$anunImagens->selecionarAnunciosImagens();
+        //$fotosArray = array();
+        //if ($anunImagens->numRows() == 1){
+        //    $fotosArray[] = $anunImagens->result();
+        //    $fotos = true;
+        //} elseif ($anunImagens->numRows() > 1) {
+        //    $fotosArray = $anunImagens->result();
+        //    $fotos = true;
+        //}else {
+        //    $fotos = false;
+        //}
         
-        $dados = array (
-            "id" => $id,
-            "confirme" => $confirme,
-            "info" => $info,
-            "fotos" => $fotos,
-            "cats" => $cats,
-            "fotosArray" => $fotosArray
-        );
+        //$c = new categorias();
+        //$cats = $c->selecionarAllCategorias();
+        $cats = $this->selecionarCategorias();
+        
+        $dados = array();
+        $dados["id"] = $id;
+        $dados["confirme"] = $confirme;
+        $dados["info"] = $info;
+        $dados["fotos"] = $fotos;
+        $dados["cats"] = $cats;
+        $dados["fotosArray"] = $fotosArray;
                         
         $this->loadTemplate("editarAnuncio", $dados);
     }
@@ -255,19 +300,19 @@ class produtoController extends controller{
             $fotos[] = $anunImagens->result();
         }
         
-        $anuncio = new anuncios();
-        $anuncio->setID($id);
-        $result = $anuncio->selecionarAnunciosID();
+        $result = $this->selecionarAnunciosID($id);
+        //$anuncio = new anuncios();
+        //$anuncio->setID($id);
+        //$result = $anuncio->selecionarAnunciosID();
         
         $usuario = new usuario();
         $usuario->setID($result['id_usuario']);
         $user = $usuario->selecionarUser();
         
-        $dados = array (
-            "fotos" => $fotos,
-            "result" => $result,
-            "user" => $user
-        );
+        $dados = array ();
+        $dados["fotos"] = $fotos;
+        $dados["result"] = $result;
+        $dados["user"] = $user;
         
         $this->loadTemplate("produto", $dados);
     }
